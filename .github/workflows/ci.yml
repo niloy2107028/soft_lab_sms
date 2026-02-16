@@ -25,8 +25,6 @@ jobs:
           distribution: "temurin" # Eclipse Temurin (formerly AdoptOpenJDK)
           cache: "maven" # Cache Maven dependencies for faster builds
 
-      # Step 3: Build the application (skip tests for now)
-      - name: Build with Maven
       # Step 3: Run All Tests
       - name: Run Tests
         run: mvn test
