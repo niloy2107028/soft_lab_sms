@@ -28,6 +28,7 @@ Your Project Folder (niloy)
 **Location:** `src/test/java/.../service/UserServiceTest.java`
 
 **What it does:**
+
 ```
 Tests ONLY UserService
 [UserService] ✅ <--- We test just this
@@ -40,8 +41,9 @@ Tests ONLY UserService
 **Uses:** Fake objects (mocks) - no real database
 
 **Tests in this file:**
+
 1. ✅ Find a user that exists
-2. ✅ Try to find a user that doesn't exist  
+2. ✅ Try to find a user that doesn't exist
 3. ✅ Check if a username exists
 
 ---
@@ -51,6 +53,7 @@ Tests ONLY UserService
 **Location:** `src/test/java/.../controller/AuthControllerIntegrationTest.java`
 
 **What it does:**
+
 ```
 Tests Controller + Service + Database together
 [Controller] --> [Service] --> [Database] ✅ All working together
@@ -63,6 +66,7 @@ Tests Controller + Service + Database together
 **Uses:** Real Spring application + Real H2 database (temporary)
 
 **Tests in this file:**
+
 1. ✅ Can anyone view the login page?
 2. ✅ Login with correct username and password
 3. ✅ Login fails with wrong password
@@ -74,17 +78,20 @@ Tests Controller + Service + Database together
 ## 🏃 HOW TO RUN TESTS
 
 ### Option 1: Using Docker (Easiest)
+
 ```bash
 docker-compose run app ./mvnw test
 ```
 
 ### Option 2: In VS Code
+
 1. Open the test file
 2. Right-click anywhere in the file
 3. Click **"Run Tests"**
 4. See results at bottom of screen
 
 ### Option 3: Run specific test
+
 ```bash
 # Run only unit tests
 docker-compose run app ./mvnw test -Dtest=UserServiceTest
@@ -103,24 +110,25 @@ docker-compose run app ./mvnw test -Dtest=AuthControllerIntegrationTest
 @Test  // This marks it as a test
 @DisplayName("Human-readable description")
 void testSomething() {
-    
+
     // STEP 1: ARRANGE (Prepare)
     // Set up test data
-    
+
     // STEP 2: ACT (Execute)
     // Run the code you want to test
-    
+
     // STEP 3: ASSERT (Check)
     // Verify the result is correct
 }
 ```
 
 ### Example from UserServiceTest:
+
 ```java
 @Test
 @DisplayName("Test 1: Should find user when username exists")
 void shouldFindUserWhenUsernameExists() {
-    
+
     // ARRANGE: Tell fake repository what to return
     when(userRepository.findByUsername("student123"))
         .thenReturn(Optional.of(testUser));
@@ -139,6 +147,7 @@ void shouldFindUserWhenUsernameExists() {
 ## ✅ WHAT TO LOOK FOR WHEN READING TESTS
 
 ### In UNIT tests (UserServiceTest.java):
+
 - `@Mock` = Fake object (not real)
 - `when().thenReturn()` = "When this happens, return this"
 - `verify()` = "Check if this method was called"
@@ -146,6 +155,7 @@ void shouldFindUserWhenUsernameExists() {
 - `assertTrue()` / `assertFalse()` = "This should be true/false"
 
 ### In INTEGRATION tests (AuthControllerIntegrationTest.java):
+
 - `mockMvc.perform()` = Simulate HTTP request (like browser)
 - `get("/login")` = Visit this URL
 - `formLogin()` = Submit login form
@@ -158,6 +168,7 @@ void shouldFindUserWhenUsernameExists() {
 ## 🎨 VISUAL: What Each Test Actually Does
 
 ### UserServiceTest (Unit Test)
+
 ```
 Test 1: Find existing user
 ┌─────────────────────┐
@@ -175,6 +186,7 @@ Test 2: Find non-existent user
 ```
 
 ### AuthControllerIntegrationTest (Integration Test)
+
 ```
 Test 1: View login page
 Browser → GET /login → Controller → ✅ Shows login.html
@@ -184,7 +196,7 @@ Browser → POST /login (student123, password123)
         → Controller → Service → Database
         → ✅ User authenticated → Redirect to /dashboard
 
-Test 3: Login with wrong password  
+Test 3: Login with wrong password
 Browser → POST /login (student123, wrongpass)
         → Controller → Service → Database
         → ❌ Authentication failed → Redirect to /login?error
@@ -195,12 +207,14 @@ Browser → POST /login (student123, wrongpass)
 ## 🔍 HOW TO KNOW IF TESTS PASSED
 
 ### Green ✅ = All Good!
+
 ```
 Tests run: 8, Failures: 0, Errors: 0, Skipped: 0
 ✓ All tests passed!
 ```
 
 ### Red ❌ = Something Failed
+
 ```
 Tests run: 8, Failures: 1, Errors: 0, Skipped: 0
 ✗ Test failed: shouldLoginWithCorrectCredentials
@@ -215,14 +229,17 @@ This means test #1 expected user to login but they didn't.
 ## 🎓 LEARNING PATH
 
 ### Step 1: Read the Comments
+
 Both test files have LOTS of comments explaining every line
 
 ### Step 2: Run the Tests
+
 ```bash
 docker-compose run app ./mvnw test
 ```
 
 ### Step 3: Make a Test Fail (On Purpose!)
+
 1. Open `UserServiceTest.java`
 2. Find this line:
    ```java
@@ -235,6 +252,7 @@ docker-compose run app ./mvnw test
 This teaches you how tests catch bugs! 🐛
 
 ### Step 4: Read More
+
 - [TESTING_GUIDE.md](TESTING_GUIDE.md) - Detailed testing concepts
 - [BRANCH_PROTECTION_GUIDE.md](BRANCH_PROTECTION_GUIDE.md) - How to protect your code
 
@@ -271,12 +289,14 @@ A: Copy an existing test, rename it, change what it tests. Follow the ARRANGE-AC
 ## 🎯 QUICK TIPS
 
 ✅ **DO:**
+
 - Read the comments in test files
 - Run tests often
 - Add tests for new features
 - Make sure tests pass before committing
 
 ❌ **DON'T:**
+
 - Skip reading comments (they explain everything!)
 - Ignore failing tests
 - Delete tests because they fail (fix the code or test instead)
