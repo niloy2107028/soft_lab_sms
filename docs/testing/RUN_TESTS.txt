@@ -1,0 +1,101 @@
+====================================
+HOW TO RUN TESTS - FOR BEGINNERS
+====================================
+
+📍 LOCATION: Run these commands from:
+   E:\3.2\SEPM Lab\SPRINGBOOT_PROJECTS\niloy
+
+
+====================================
+✅ OPTION 1: Run Unit Test (FAST)
+====================================
+This tests ONE component (UserService) - takes 1 second
+
+$env:JAVA_HOME = "C:\Program Files\Java\jdk-25"; ./mvnw.cmd test -Dtest=UserServiceTest
+
+
+====================================
+✅ OPTION 2: Run Integration Test (SLOWER)  
+====================================
+This tests MANY components together - takes 5-10 seconds
+
+$env:JAVA_HOME = "C:\Program Files\Java\jdk-25"; ./mvnw.cmd test -Dtest=AuthControllerIntegrationTest
+
+
+====================================
+✅ OPTION 3: Run ALL Tests
+====================================
+Runs both unit and integration tests
+
+$env:JAVA_HOME = "C:\Program Files\Java\jdk-25"; ./mvnw.cmd test
+
+
+====================================
+✅ OPTION 4: Clean Build + Tests
+====================================
+Cleans everything first, then runs tests
+
+$env:JAVA_HOME = "C:\Program Files\Java\jdk-25"; ./mvnw.cmd clean test
+
+
+====================================
+📊 WHAT TO EXPECT
+====================================
+
+✅ SUCCESS looks like:
+   Tests run: 5, Failures: 0, Errors: 0, Skipped: 0
+   BUILD SUCCESS
+
+❌ FAILURE looks like:
+   Tests run: 5, Failures: 2, Errors: 0
+   BUILD FAILURE
+   (Check which test failed in the output)
+
+
+====================================
+📚 WHAT EACH TEST DOES
+====================================
+
+UNIT TEST (UserServiceTest):
+  ✓ Test 1: Find user that exists
+  ✓ Test 2: Find user that doesn't exist  
+  ✓ Test 3: Check if username exists
+  
+  Tests: UserService methods
+  Speed: ⚡ 1 second
+  
+INTEGRATION TEST (AuthControllerIntegrationTest):
+  ✓ Test 1: Can users see login page?
+  ✓ Test 2: Is dashboard protected from non-logged users?
+  
+  Tests: Login page + security
+  Speed: 🐢 5-10 seconds
+
+
+====================================
+🆘 TROUBLESHOOTING
+====================================
+
+Problem: "JAVA_HOME is not set"
+Solution: Run the $env:JAVA_HOME command first
+
+Problem: "mvnw.cmd not found"
+Solution: Make sure you're in the niloy folder
+
+Problem: "Build failed"
+Solution: Make sure Docker is NOT required for tests
+          (Unit and integration tests use H2, not PostgreSQL)
+
+
+====================================
+💡 TIP FOR BEGINNERS
+====================================
+
+Start with UNIT tests - they're faster and easier!
+Once you understand unit tests, try integration tests.
+
+Unit Test = Test one piece
+Integration Test = Test many pieces together
+
+Both are important for learning!
+====================================

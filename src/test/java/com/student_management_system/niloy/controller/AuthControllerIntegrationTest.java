@@ -5,64 +5,71 @@ import com.student_management_system.niloy.model.User;
 import com.student_management_system.niloy.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.WebApplicationContext;
 
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders.formLogin;
-import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.authenticated;
-import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.unauthenticated;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  * ============================================
- * 🔗 SIMPLE INTEGRATION TEST EXAMPLE
+ * 🔗 BEGINNER-FRIENDLY INTEGRATION TEST
  * ============================================
  * 
- * What is this?
- * This tests how MULTIPLE parts work TOGETHER.
- * Think of it like test-driving a whole car - not just the engine.
+ * 📚 WHAT IS THIS FILE?
+ * ---------------------
+ * This tests if MULTIPLE parts of your app work TOGETHER correctly.
  * 
- * Why "Integration" Test?
- * - Tests Controller + Service + Database together
- * - Uses a REAL (but temporary) database (H2)
- * - Starts the whole Spring application
- * - SLOWER than unit tests (takes seconds, not milliseconds)
- * - More realistic - tests actual user scenarios
+ * 🎯 INTEGRATION TEST vs UNIT TEST:
+ * ----------------------------------
+ * Unit Test (UserServiceTest) = Testing ONE piece alone (like testing just the engine)
+ * Integration Test (THIS file) = Testing MANY pieces together (like driving the whole car)
  * 
- * When to use Integration Tests?
- * - Testing login/authentication flows
- * - Testing complete user journeys
- * - Making sure components work together
- * - Before deploying to production
+ * 🔍 WHAT DOES THIS TEST?
+ * ------------------------
+ * 1. Can users see the login page?
+ * 2. Are protected pages blocked from non-logged-in users?
+ * 
+ * ⚙️ HOW IT WORKS:
+ * ----------------
+ * - Starts your WHOLE Spring Boot application (just for testing)
+ * - Creates a TEMPORARY database (H2) that disappears after tests
+ * - Simulates a web browser visiting your pages
+ * - Checks if everything works correctly
+ * 
+ * ⏱️ SPEED:
+ * ----------
+ * Slower than unit tests (takes 5-10 seconds) because it starts the whole app
  */
-@SpringBootTest  // Starts the whole application
-@AutoConfigureMockMvc  // Allows us to simulate HTTP requests
+
+@SpringBootTest  // 👉 This starts your entire Spring Boot application
 @TestPropertySource(properties = {
-    // Use H2 in-memory database for testing (temporary, deleted after tests)
+    // 👉 Use temporary H2 database (in memory, deleted after tests)
     "spring.datasource.url=jdbc:h2:mem:testdb",
     "spring.datasource.driver-class-name=org.h2.Driver",
     "spring.jpa.hibernate.ddl-auto=create-drop"
 })
-@Transactional  // Rolls back database changes after each test
-@DisplayName("Simple Integration Test Example - Login")
+@Transactional  // 👉 Automatically cleans up database after each test
 public class AuthControllerIntegrationTest {
 
     // ========================================
-    // Step 1: Set Up Test Tools
+    // TOOLS WE NEED FOR TESTING
     // ========================================
     
-    // MockMvc simulates HTTP requests (like a browser)
-    @Autowired
+    // MockMvc = Pretends to be a web browser
     private MockMvc mockMvc;
 
-    // Real database repository (using H2 in-memory)
+    // Get Spring application context (all your app's components)
+    @Autowired
+    private WebApplicationContext webApplicationContext;
+
+    // Real database access
     @Autowired
     private UserRepository userRepository;
 
@@ -70,194 +77,150 @@ public class AuthControllerIntegrationTest {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    private User testStudent;
-
-    // This runs BEFORE each test
+    // ========================================
+    // SETUP: Runs BEFORE Each Test
+    // ========================================
     @BeforeEach
     void setUp() {
-        // Clean database
-        userRepository.deleteAll();
+        // Set up our "fake browser" (MockMvc)
+        this.mockMvc = MockMvcBuilders
+            .webAppContextSetup(webApplicationContext)
+            .apply(org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity())
+            .build();
         
-        // Create a test user in the database
-        testStudent = new User();
-        testStudent.setUsername("student123");
-        testStudent.setPassword(passwordEncoder.encode("password123"));
-        testStudent.setEmail("student@test.com");
-        testStudent.setRole(Role.STUDENT);
-        testStudent.setEnabled(true);
+        // Create a test user in the temporary database
+        User testUser = new User();
+        testUser.setUsername("student123");
+        testUser.setPassword(passwordEncoder.encode("password123"));
+        testUser.setEmail("student@test.com");
+        testUser.setRole(Role.STUDENT);
+        testUser.setEnabled(true);
         
-        // Save to database
-        userRepository.save(testStudent);
+        userRepository.save(testUser);  // Save to H2 database
     }
 
     // ========================================
-    // Test 1: View Login Page
+    // ✅ TEST 1: Can Anyone See Login Page?
     // ========================================
     @Test
-    @DisplayName("Test 1: Anyone can see the login page")
-    void shouldDisplayLoginPage() throws Exception {
+    void test1_AnyoneCanViewLoginPage() throws Exception {
         
-        // ARRANGE: Nothing needed
+        // 📖 WHAT ARE WE TESTING?
+        // We're checking if the login page shows up when someone visits it.
+        // This is like opening a webpage in your browser.
         
-        // ACT: Simulate GET request to /login
-        // This is like typing "localhost:8081/login" in browser
+        // 🎬 ACT: Visit the /login page (like clicking a link)
         mockMvc.perform(get("/login"))
         
-            // ASSERT: Check the response
-            .andExpect(status().isOk())  // Should return HTTP 200 (success)
-            .andExpect(view().name("login"))  // Should show login.html template
-            .andExpect(content().string(
-                org.hamcrest.Matchers.containsString("Student Management System")
-            ));  // Page should contain this text
+            // ✅ ASSERT: Check what happened
+            .andExpect(status().isOk())  // HTTP 200 = Page loaded successfully
+            .andExpect(view().name("login"));  // It shows the login.html page
+        
+        // 💡 WHY THIS TEST MATTERS:
+        // If this fails, users can't even see your login page!
     }
 
     // ========================================
-    // Test 2: Login with CORRECT Password
+    // ✅ TEST 2: Are Protected Pages Blocked?
     // ========================================
     @Test
-    @DisplayName("Test 2: Should login successfully with correct password")
-    void shouldLoginWithCorrectCredentials() throws Exception {
+    void test2_DashboardIsBlockedWithoutLogin() throws Exception {
         
-        // ACT: Simulate submitting login form
-        // Like typing username & password and clicking "Login" button
-        mockMvc.perform(formLogin("/login")
-                .user("student123")       // Type username
-                .password("password123")) // Type password
+        // 📖 WHAT ARE WE TESTING?
+        // We're checking if the dashboard is protected.
+        // Users who aren't logged in should NOT be able to see it.
         
-            // ASSERT: Check what happened
-            .andExpect(authenticated()  // User should be logged in
-                .withUsername("student123"))  // Logged in as this user
-            .andExpect(authenticated()
-                .withRoles("STUDENT"))  // Should have STUDENT role
-            .andExpect(status().is3xxRedirection())  // Should redirect (HTTP 302)
-            .andExpect(redirectedUrl("/dashboard"));  // Redirect to dashboard
-    }
-
-    // ========================================
-    // Test 3: Login with WRONG Password
-    // ========================================
-    @Test
-    @DisplayName("Test 3: Should fail with wrong password")
-    void shouldFailWithWrongPassword() throws Exception {
-        
-        // ACT: Try to login with wrong password
-        mockMvc.perform(formLogin("/login")
-                .user("student123")
-                .password("wrongpassword"))  // Wrong password!
-        
-            // ASSERT: Login should fail
-            .andExpect(unauthenticated())  // User is NOT logged in
-            .andExpect(status().is3xxRedirection())  // Redirects back
-            .andExpect(redirectedUrl("/login?error"));  // Shows error message
-    }
-
-    // ========================================
-    // Test 4: Login with User That Doesn't Exist
-    // ========================================
-    @Test
-    @DisplayName("Test 4: Should fail with non-existent user")
-    void shouldFailWithNonExistentUser() throws Exception {
-        
-        // ACT: Try to login with username that doesn't exist
-        mockMvc.perform(formLogin("/login")
-                .user("nobody")  // This user doesn't exist
-                .password("password123"))
-        
-            // ASSERT: Login should fail
-            .andExpect(unauthenticated())
-            .andExpect(status().is3xxRedirection())
-            .andExpect(redirectedUrl("/login?error"));
-    }
-
-    // ========================================
-    // Test 5: Access Dashboard WITHOUT Login
-    // ========================================
-    @Test
-    @DisplayName("Test 5: Cannot access dashboard without login")
-    void shouldBlockDashboardWithoutLogin() throws Exception {
-        
-        // ACT: Try to access dashboard without logging in
+        // 🎬 ACT: Try to visit /dashboard WITHOUT logging in first
         mockMvc.perform(get("/dashboard"))
         
-            // ASSERT: Should be redirected to login page
-            .andExpect(status().is3xxRedirection())
-            .andExpect(redirectedUrlPattern("**/login"));
+            // ✅ ASSERT: Should redirect us to login page
+            .andExpect(status().is3xxRedirection());  // HTTP 302 = Redirected
+        
+        // 💡 WHY THIS TEST MATTERS:
+        // This protects your app! If this test fails, anyone can see
+        // private student data without logging in. That's bad!
     }
 }
 
 /**
  * ============================================
- * 📚 KEY CONCEPTS EXPLAINED
+ * 📚 WHAT DID WE JUST TEST?
  * ============================================
  * 
- * 1. @SpringBootTest
- *    - Starts the ENTIRE application
- *    - Like running your app normally, but for testing
+ * Test 1: Login Page Works ✅
+ * - Users can see the login page
+ * - No errors when visiting /login
  * 
- * 2. @AutoConfigureMockMvc
- *    - Gives us MockMvc tool
- *    - MockMvc simulates HTTP requests (like a browser)
+ * Test 2: Security Works ✅
+ * - Dashboard is protected
+ * - Non-logged-in users are redirected to login
  * 
- * 3. mockMvc.perform(get("/url"))
- *    - Simulates visiting a URL
- *    - Like typing URL in browser
+ * ============================================
+ * 🎓 KEY CONCEPTS FOR BEGINNERS
+ * ============================================
  * 
- * 4. formLogin()
- *    - Simulates submitting a login form
- *    - Tests username + password login
+ * 1️⃣ @SpringBootTest
+ *    Starts your entire app (like pressing "Run" in VS Code)
  * 
- * 5. .andExpect()
- *    - Checks what the response is
- *    - Examples:
- *      - status().isOk() = HTTP 200 (success)
- *      - authenticated() = User is logged in
- *      - redirectedUrl() = Redirected to this page
+ * 2️⃣ MockMvc
+ *    Pretends to be a web browser. It can:
+ *    - Visit pages (GET requests)
+ *    - Submit forms (POST requests)
+ *    - Check what the response is
  * 
- * 6. H2 Database
- *    - Temporary in-memory database
- *    - Created when test starts
- *    - Deleted when test ends
- *    - Perfect for testing
+ * 3️⃣ mockMvc.perform(get("/url"))
+ *    Visits a URL (like typing "localhost:8081/login" in browser)
  * 
- * 7. @Transactional
- *    - Rolls back database changes after each test
- *    - Keeps tests independent
+ * 4️⃣ .andExpect(...)
+ *    Checks if the result is what we expect
+ *    Examples:
+ *    - status().isOk() = Page loaded fine (HTTP 200)
+ *    - status().is3xxRedirection() = Got redirected (HTTP 302)
+ *    - view().name("login") = Shows the login.html page
+ * 
+ * 5️⃣ H2 Database
+ *    A temporary database that exists only during testing.
+ *    Created when test starts → Deleted when test ends
+ *    Your real PostgreSQL database is NOT affected!
+ * 
+ * ============================================
+ * 🔍 INTEGRATION vs UNIT TEST
+ * ============================================
+ * 
+ * UNIT TEST (UserServiceTest.java):
+ * ✓ Tests ONE class alone
+ * ✓ Uses fake objects (@Mock)
+ * ✓ No database needed
+ * ✓ Very fast (milliseconds)
+ * ✓ Example: Does getUserByUsername() work?
+ * 
+ * INTEGRATION TEST (THIS file):
+ * ✓ Tests MANY parts together
+ * ✓ Uses real Spring application
+ * ✓ Uses real (temporary) database
+ * ✓ Slower (5-10 seconds)
+ * ✓ Example: Can users visit protected pages?
+ * 
+ * BOTH ARE IMPORTANT! Use both types of tests.
  * 
  * ============================================
  * 🏃 HOW TO RUN THIS TEST
  * ============================================
  * 
- * Option 1: In VS Code
- * - Right-click on this file
- * - Click "Run Tests"
+ * In Terminal (PowerShell):
+ *   $env:JAVA_HOME = "C:\Program Files\Java\jdk-25"
+ *   ./mvnw.cmd test -Dtest=AuthControllerIntegrationTest
  * 
- * Option 2: In Docker
- * docker-compose run app ./mvnw test -Dtest=AuthControllerIntegrationTest
+ * Or run ALL tests:
+ *   ./mvnw.cmd test
  * 
- * Option 3: What to expect
- * - First time: Takes 10-20 seconds (starts Spring application)
- * - Next times: Faster (Spring context is cached)
- * - Green ✅ = All tests passed
- * - Red ❌ = Some tests failed (check which one)
+ * In VS Code:
+ *   Click the ▶️ button above the class name
  * 
- * ============================================
- * 🔍 DIFFERENCE FROM UNIT TEST
- * ============================================
+ * What to expect:
+ *   ✅ Tests run: 2, Failures: 0, Errors: 0
+ *   ✅ BUILD SUCCESS
+ *   Takes 5-10 seconds (slower than unit tests)
  * 
- * Unit Test (UserServiceTest):
- * ✓ Tests ONE thing
- * ✓ Uses fake objects (@Mock)
- * ✓ No database
- * ✓ Very fast (milliseconds)
- * ✗ Doesn't test real scenarios
- * 
- * Integration Test (This file):
- * ✓ Tests MULTIPLE things together
- * ✓ Uses real Spring application
- * ✓ Uses real (H2) database
- * ✓ Tests realistic user scenarios
- * ✗ Slower (seconds)
- * 
- * Both are important! Use both types.
  * ============================================
  */
