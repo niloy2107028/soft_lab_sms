@@ -3,6 +3,7 @@
 ## What Are Branch Protection Rules?
 
 Branch protection rules prevent team members from pushing broken code to important branches (like `main`). They enforce best practices like:
+
 - ✅ Requiring code reviews before merging
 - ✅ Ensuring tests pass before merging
 - ✅ Preventing direct pushes to main branch
@@ -29,6 +30,7 @@ Branch protection rules prevent team members from pushing broken code to importa
 ### Step 1: Go to Your Repository Settings
 
 1. Open your browser and go to:
+
    ```
    https://github.com/niloy2107028/soft_lab_sms
    ```
@@ -39,7 +41,6 @@ Branch protection rules prevent team members from pushing broken code to importa
 ### Step 2: Navigate to Branch Protection
 
 1. In the left sidebar, click on **"Branches"**
-   
 2. You'll see a section called **"Branch protection rules"**
 
 3. Click **"Add branch protection rule"** button
@@ -47,6 +48,7 @@ Branch protection rules prevent team members from pushing broken code to importa
 ### Step 3: Configure the Rule
 
 #### A. Branch Name Pattern
+
 - In the **"Branch name pattern"** field, type:
   ```
   main
@@ -58,30 +60,37 @@ Branch protection rules prevent team members from pushing broken code to importa
 Check these boxes (recommended for learning):
 
 **1. ✅ Require a pull request before merging**
-   - This means you can't push directly to `main`
-   - All changes must go through a pull request
-   
-   Sub-options to enable:
-   - ✅ **"Require approvals"**: Set to `1` approval
-     - Someone must review and approve your code
-   - ✅ **"Dismiss stale pull request approvals when new commits are pushed"**
-     - If you change code after approval, it needs re-approval
+
+- This means you can't push directly to `main`
+- All changes must go through a pull request
+
+Sub-options to enable:
+
+- ✅ **"Require approvals"**: Set to `1` approval
+  - Someone must review and approve your code
+- ✅ **"Dismiss stale pull request approvals when new commits are pushed"**
+  - If you change code after approval, it needs re-approval
 
 **2. ✅ Require status checks to pass before merging**
-   - Tests must pass before merging
-   
-   Click **"Add status check"** and search for:
-   - `build-and-test` (this is your CI workflow job name)
-   
-   Also check:
-   - ✅ **"Require branches to be up to date before merging"**
-     - Ensures your branch has latest changes from main
+
+- Tests must pass before merging
+
+Click **"Add status check"** and search for:
+
+- `build-and-test` (this is your CI workflow job name)
+
+Also check:
+
+- ✅ **"Require branches to be up to date before merging"**
+  - Ensures your branch has latest changes from main
 
 **3. ✅ Require conversation resolution before merging**
-   - All code review comments must be resolved
+
+- All code review comments must be resolved
 
 **4. ✅ Do not allow bypassing the above settings**
-   - Even repository admins must follow rules (good practice!)
+
+- Even repository admins must follow rules (good practice!)
 
 #### C. (Optional) Additional Settings
 
@@ -104,6 +113,7 @@ These are optional but useful:
 ### The New Workflow
 
 **Old Way (Before Protection):**
+
 ```bash
 git add .
 git commit -m "changes"
@@ -113,17 +123,20 @@ git push origin main  # ❌ This will now be BLOCKED!
 **New Way (With Protection):**
 
 1. **Create a new branch:**
+
    ```bash
    git checkout -b feature/my-new-feature
    ```
 
 2. **Make your changes and commit:**
+
    ```bash
    git add .
    git commit -m "Add new feature"
    ```
 
 3. **Push to your branch:**
+
    ```bash
    git push origin feature/my-new-feature
    ```
@@ -169,6 +182,7 @@ git push origin main
 ```
 
 **Expected Result:** ❌ Push rejected with error:
+
 ```
 ! [remote rejected] main -> main (protected branch hook declined)
 ```
@@ -188,6 +202,7 @@ git push origin test-branch-protection
 ```
 
 Then:
+
 1. Go to GitHub
 2. Create a Pull Request
 3. Watch CI run
@@ -200,11 +215,13 @@ Then:
 ### Where to See CI Results
 
 **On GitHub:**
+
 1. Go to repository: https://github.com/niloy2107028/soft_lab_sms
 2. Click **"Actions"** tab
 3. You'll see all workflow runs
 
 **What You'll See:**
+
 - ✅ Green check = Tests passed
 - ❌ Red X = Tests failed
 - 🟡 Yellow dot = Tests running
@@ -224,6 +241,7 @@ Your `.github/workflows/ci.yml` does:
 ### Viewing Test Results
 
 After CI runs:
+
 1. Click on the workflow run
 2. Click **"build-and-test"** job
 3. Expand each step to see details
@@ -234,10 +252,13 @@ After CI runs:
 ## 🚨 Common Issues and Solutions
 
 ### Issue 1: "Branch protection rule prevents push"
+
 **Solution:** This is correct! Use pull requests instead.
 
 ### Issue 2: CI tests failing
-**Solution:** 
+
+**Solution:**
+
 ```bash
 # Run tests locally first
 mvn test
@@ -247,13 +268,17 @@ mvn test
 ```
 
 ### Issue 3: "No status checks found"
-**Solution:** 
+
+**Solution:**
+
 - Make sure CI workflow ran at least once
 - Check workflow file name matches
 - Wait a few minutes after first push
 
 ### Issue 4: Can't merge PR
+
 **Checklist:**
+
 - ✅ All CI checks passed?
 - ✅ Got required approval?
 - ✅ All comments resolved?
@@ -264,11 +289,13 @@ mvn test
 ## 📚 Additional Commands
 
 ### Create and Switch to New Branch
+
 ```bash
 git checkout -b feature/add-new-feature
 ```
 
 ### Update Your Branch with Latest Main
+
 ```bash
 git checkout main
 git pull origin main
@@ -277,6 +304,7 @@ git merge main
 ```
 
 ### Delete Branch After Merging
+
 ```bash
 git branch -d feature/old-feature
 git push origin --delete feature/old-feature
@@ -295,6 +323,7 @@ git push origin --delete feature/old-feature
 ## ✅ Quick Reference
 
 ### Branch Protection Checklist
+
 - [ ] Branch protection rule created for `main`
 - [ ] Require pull requests enabled
 - [ ] Require status checks enabled
@@ -303,9 +332,10 @@ git push origin --delete feature/old-feature
 - [ ] Team members understand new workflow
 
 ### Workflow Reminder
+
 ```
-1. Create branch → 2. Make changes → 3. Commit → 
-4. Push → 5. Create PR → 6. CI runs → 
+1. Create branch → 2. Make changes → 3. Commit →
+4. Push → 5. Create PR → 6. CI runs →
 7. Get review → 8. Merge
 ```
 

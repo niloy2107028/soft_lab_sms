@@ -7,7 +7,6 @@ A comprehensive Spring Boot application for managing students, teachers, courses
 - **User Authentication & Authorization**
   - Role-based access (Student & Teacher)
   - Secure login with Spring Security
-  
 - **Student Management**
   - Student profiles with personal information
   - Course enrollment tracking
@@ -50,12 +49,14 @@ A comprehensive Spring Boot application for managing students, teachers, courses
 ### Using Docker (Recommended)
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/niloy2107028/soft_lab_sms.git
    cd soft_lab_sms
    ```
 
 2. **Start the application**
+
    ```bash
    docker-compose up --build
    ```
@@ -69,8 +70,8 @@ A comprehensive Spring Boot application for managing students, teachers, courses
 1. **Configure PostgreSQL**
    - Install PostgreSQL
    - Create database: `student_management`
-   
 2. **Update application.properties**
+
    ```properties
    spring.datasource.url=jdbc:postgresql://localhost:5432/student_management
    spring.datasource.username=your_username
@@ -85,21 +86,25 @@ A comprehensive Spring Boot application for managing students, teachers, courses
 ## 👤 Demo Credentials
 
 ### Teacher Account
+
 - Username: `teacher1`
 - Password: `password123`
 
 ### Student Account
+
 - Username: `student1`
 - Password: `password123`
 
 ## 🧪 Running Tests
 
 ### Run all tests
+
 ```bash
 mvn test
 ```
 
 ### Run specific test
+
 ```bash
 # Unit tests
 mvn test -Dtest=UserServiceTest
@@ -109,6 +114,7 @@ mvn test -Dtest=AuthControllerIntegrationTest
 ```
 
 ### Test Coverage
+
 See [TESTING_GUIDE.md](TESTING_GUIDE.md) for detailed testing documentation.
 
 ## 🏗 Project Structure
@@ -138,21 +144,25 @@ niloy/
 ## 📝 API Endpoints
 
 ### Authentication
+
 - `GET /login` - Login page
 - `POST /login` - Process login
 - `GET /logout` - Logout
 
 ### Student Routes
+
 - `GET /student/dashboard` - Student dashboard
 - `GET /student/profile` - View profile
 - `PUT /student/profile` - Update profile
 
 ### Teacher Routes
+
 - `GET /teacher/dashboard` - Teacher dashboard
 - `GET /teacher/profile` - View profile
 - `PUT /teacher/profile` - Update profile
 
 ### Admin Routes (Teacher)
+
 - `GET /manage-students` - Manage students
 - `GET /manage-teachers` - Manage teachers
 - `GET /manage-courses` - Manage courses
@@ -183,6 +193,7 @@ The application uses Docker Compose with two services:
 ## 🚀 CI/CD
 
 GitHub Actions workflow automatically:
+
 - Runs tests on every push/PR
 - Builds the application
 - Reports test results
@@ -209,6 +220,7 @@ This project is licensed under the MIT License.
 ## 👨‍💻 Author
 
 **Niloy**
+
 - GitHub: [@niloy2107028](https://github.com/niloy2107028)
 
 ## 🙏 Acknowledgments

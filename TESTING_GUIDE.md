@@ -11,6 +11,7 @@ Testing verifies that your code works correctly. Imagine you're building a car -
 Located: `src/test/java/.../service/UserServiceTest.java`
 
 **What it does:**
+
 - Tests ONE component in isolation (just the UserService)
 - Uses **mocks** (fake objects) instead of real database
 - Very FAST (runs in milliseconds)
@@ -18,6 +19,7 @@ Located: `src/test/java/.../service/UserServiceTest.java`
 **Analogy:** Like testing just the car engine on a test bench - not the whole car.
 
 **Key Concepts:**
+
 ```java
 @Mock  // Creates a fake/dummy object
 private UserRepository userRepository;
@@ -27,11 +29,13 @@ private UserService userService;
 ```
 
 **The 3 A's Pattern:**
+
 1. **ARRANGE**: Set up test data
 2. **ACT**: Run the method you're testing
 3. **ASSERT**: Check if the result is correct
 
 **Example from our code:**
+
 ```java
 @Test
 void testLoadUserByUsername_Success() {
@@ -53,6 +57,7 @@ void testLoadUserByUsername_Success() {
 Located: `src/test/java/.../controller/AuthControllerIntegrationTest.java`
 
 **What it does:**
+
 - Tests how MULTIPLE components work TOGETHER
 - Uses real Spring context (loads the whole application)
 - Uses H2 in-memory database (temporary database just for tests)
@@ -61,6 +66,7 @@ Located: `src/test/java/.../controller/AuthControllerIntegrationTest.java`
 **Analogy:** Like test-driving the whole car on a track - testing everything together.
 
 **Key Concepts:**
+
 ```java
 @SpringBootTest  // Starts the entire Spring application
 @AutoConfigureMockMvc  // Allows simulating HTTP requests
@@ -68,6 +74,7 @@ Located: `src/test/java/.../controller/AuthControllerIntegrationTest.java`
 ```
 
 **Example from our code:**
+
 ```java
 @Test
 void testLogin_ValidStudentCredentials() throws Exception {
@@ -83,6 +90,7 @@ void testLogin_ValidStudentCredentials() throws Exception {
 ## 🔄 Running the Tests
 
 ### Option 1: Using Maven Command
+
 ```bash
 # Run all tests
 mvn test
@@ -95,10 +103,12 @@ mvn test -Dtest=AuthControllerIntegrationTest
 ```
 
 ### Option 2: Using IDE
+
 - Right-click on the test file → "Run Tests"
 - Or click the green play button next to test methods
 
 ### Option 3: In Docker
+
 ```bash
 docker-compose run app mvn test
 ```
@@ -106,6 +116,7 @@ docker-compose run app mvn test
 ## 📊 Understanding Test Results
 
 When tests run, you'll see output like:
+
 ```
 [INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0
 ```
@@ -118,6 +129,7 @@ When tests run, you'll see output like:
 ## ✅ What We Test
 
 ### UserServiceTest (Unit Tests)
+
 1. ✓ Loading user by username (success case)
 2. ✓ Loading user by username (user not found)
 3. ✓ Creating a new user (success)
@@ -127,6 +139,7 @@ When tests run, you'll see output like:
 7. ✓ Getting user when not found
 
 ### AuthControllerIntegrationTest (Integration Tests)
+
 1. ✓ Displaying login page
 2. ✓ Login with valid student credentials
 3. ✓ Login with valid teacher credentials
@@ -137,15 +150,15 @@ When tests run, you'll see output like:
 
 ## 🎓 Key Testing Terms
 
-| Term | Meaning |
-|------|---------|
-| **@Test** | Marks a method as a test |
-| **@BeforeEach** | Runs before each test (setup) |
-| **assertEquals(expected, actual)** | Checks if two values are equal |
-| **assertTrue(condition)** | Checks if something is true |
+| Term                                   | Meaning                            |
+| -------------------------------------- | ---------------------------------- |
+| **@Test**                              | Marks a method as a test           |
+| **@BeforeEach**                        | Runs before each test (setup)      |
+| **assertEquals(expected, actual)**     | Checks if two values are equal     |
+| **assertTrue(condition)**              | Checks if something is true        |
 | **assertThrows(Exception.class, ...)** | Checks if code throws an exception |
-| **verify(mock, times(1))** | Checks if a mock method was called |
-| **when(...).thenReturn(...)** | Defines mock behavior |
+| **verify(mock, times(1))**             | Checks if a mock method was called |
+| **when(...).thenReturn(...)**          | Defines mock behavior              |
 
 ## 🚀 Best Practices
 
@@ -167,12 +180,15 @@ When tests run, you'll see output like:
 ## 🐛 Common Issues
 
 ### "Connection refused" error
+
 → Integration tests need H2 database dependency (already added in pom.xml)
 
 ### "Bean not found" error
+
 → Make sure @SpringBootTest is present for integration tests
 
 ### Tests pass locally but fail in CI
+
 → Check database setup and environment variables
 
 ## 📁 Test Structure

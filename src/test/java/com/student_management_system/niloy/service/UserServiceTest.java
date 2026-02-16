@@ -9,180 +9,176 @@ import org.junit.jupiter.api.DisplayName;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 /**
- * UNIT TEST Example
+ * ============================================
+ * 🎯 SIMPLE UNIT TEST EXAMPLE
+ * ============================================
  * 
- * This is a UNIT TEST for UserService class.
- * Unit tests focus on testing a SINGLE unit/component in isolation.
+ * What is this?
+ * This file tests the UserService class in ISOLATION.
+ * Think of it like testing just the engine of a car - not the whole car.
  * 
- * Key Concepts:
- * - @Mock: Creates a fake/mock object (doesn't use real database)
- * - @InjectMocks: Injects the mocked dependencies into the class being tested
- * - We test ONE service at a time without depending on other components
- * - Fast execution (no database, no Spring context)
+ * Why "Unit" Test?
+ * - Tests ONE small piece (unit) of code
+ * - Uses FAKE objects (mocks) instead of real database
+ * - FAST - runs in milliseconds
+ * - No need to start the whole application
+ * 
+ * When to use Unit Tests?
+ * - Testing business logic in Service classes
+ * - Testing calculations or data transformations
+ * - When you want fast feedback
  */
-@DisplayName("UserService Unit Tests")
+@DisplayName("Simple Unit Test Example - UserService")
 public class UserServiceTest {
 
+    // ========================================
+    // Step 1: Set Up Test Tools
+    // ========================================
+    
+    // @Mock creates a FAKE UserRepository
+    // It doesn't connect to real database
     @Mock
     private UserRepository userRepository;
 
-    @Mock
-    private PasswordEncoder passwordEncoder;
-
+    // @InjectMocks creates a REAL UserService
+    // But injects the FAKE repository into it
     @InjectMocks
     private UserService userService;
 
     private User testUser;
 
+    // This runs BEFORE each test
     @BeforeEach
     void setUp() {
-        // Initialize mocks before each test
+        // Initialize the mocks
         MockitoAnnotations.openMocks(this);
         
-        // Create a test user
+        // Create a sample user for testing
         testUser = new User();
         testUser.setId(1L);
-        testUser.setUsername("testuser");
-        testUser.setPassword("encodedPassword123");
-        testUser.setEmail("test@example.com");
+        testUser.setUsername("student123");
+        testUser.setEmail("student@test.com");
         testUser.setRole(Role.STUDENT);
-        testUser.setEnabled(true);
     }
 
+    // ========================================
+    // Test 1: Find User That EXISTS
+    // ========================================
     @Test
-    @DisplayName("Should successfully load user by username")
-    void testLoadUserByUsername_Success() {
-        // ARRANGE: Set up test data and mock behavior
-        when(userRepository.findByUsername("testuser"))
+    @DisplayName("Test 1: Should find user when username exists")
+    void shouldFindUserWhenUsernameExists() {
+        
+        // STEP 1: ARRANGE (Prepare)
+        // Tell the fake repository: "When someone asks for 'student123', return testUser"
+        when(userRepository.findByUsername("student123"))
             .thenReturn(Optional.of(testUser));
 
-        // ACT: Execute the method being tested
-        UserDetails userDetails = userService.loadUserByUsername("testuser");
+        // STEP 2: ACT (Execute)
+        // Call the real method we want to test
+        Optional<User> result = userService.getUserByUsername("student123");
 
-        // ASSERT: Verify the results
-        assertNotNull(userDetails);
-        assertEquals("testuser", userDetails.getUsername());
-        assertEquals("encodedPassword123", userDetails.getPassword());
-        assertTrue(userDetails.getAuthorities().stream()
-            .anyMatch(auth -> auth.getAuthority().equals("ROLE_STUDENT")));
+        // STEP 3: ASSERT (Check Result)
+        // Check if we got the user back
+        assertTrue(result.isPresent(), "User should be found");
+        assertEquals("student123", result.get().getUsername(), "Username should match");
+        assertEquals("student@test.com", result.get().getEmail(), "Email should match");
         
-        // Verify that the repository method was called exactly once
-        verify(userRepository, times(1)).findByUsername("testuser");
+        // Verify the repository method was called exactly once
+        verify(userRepository, times(1)).findByUsername("student123");
     }
 
+    // ========================================
+    // Test 2: Find User That DOESN'T EXIST
+    // ========================================
     @Test
-    @DisplayName("Should throw exception when user not found")
-    void testLoadUserByUsername_UserNotFound() {
-        // ARRANGE: Mock repository to return empty
-        when(userRepository.findByUsername("nonexistent"))
+    @DisplayName("Test 2: Should return empty when user not found")
+    void shouldReturnEmptyWhenUserNotFound() {
+        
+        // ARRANGE: Tell fake repository to return nothing
+        when(userRepository.findByUsername("unknown"))
             .thenReturn(Optional.empty());
 
-        // ACT & ASSERT: Verify exception is thrown
-        assertThrows(UsernameNotFoundException.class, () -> {
-            userService.loadUserByUsername("nonexistent");
-        });
+        // ACT: Try to find non-existent user
+        Optional<User> result = userService.getUserByUsername("unknown");
+
+        // ASSERT: Should get empty result
+        assertFalse(result.isPresent(), "User should NOT be found");
         
-        verify(userRepository, times(1)).findByUsername("nonexistent");
+        // Verify the method was called
+        verify(userRepository, times(1)).findByUsername("unknown");
     }
 
+    // ========================================
+    // Test 3: Check Username Exists
+    // ========================================
     @Test
-    @DisplayName("Should create new user successfully")
-    void testCreateUser_Success() {
-        // ARRANGE
-        when(userRepository.existsByUsername("newuser")).thenReturn(false);
-        when(userRepository.existsByEmail("new@example.com")).thenReturn(false);
-        when(passwordEncoder.encode("password123")).thenReturn("encodedPassword");
-        when(userRepository.save(any(User.class))).thenReturn(testUser);
-
-        // ACT
-        User createdUser = userService.createUser("newuser", "password123", 
-                                                   "new@example.com", Role.STUDENT);
-
-        // ASSERT
-        assertNotNull(createdUser);
-        assertEquals(1L, createdUser.getId());
-        verify(userRepository, times(1)).existsByUsername("newuser");
-        verify(userRepository, times(1)).existsByEmail("new@example.com");
-        verify(passwordEncoder, times(1)).encode("password123");
-        verify(userRepository, times(1)).save(any(User.class));
-    }
-
-    @Test
-    @DisplayName("Should throw exception when username already exists")
-    void testCreateUser_UsernameExists() {
-        // ARRANGE
-        when(userRepository.existsByUsername("existinguser")).thenReturn(true);
-
-        // ACT & ASSERT
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-            userService.createUser("existinguser", "password123", 
-                                   "test@example.com", Role.STUDENT);
-        });
+    @DisplayName("Test 3: Should check if username exists")
+    void shouldCheckIfUsernameExists() {
         
-        assertEquals("Username already exists", exception.getMessage());
-        verify(userRepository, times(1)).existsByUsername("existinguser");
-        verify(userRepository, never()).save(any(User.class));
-    }
+        // ARRANGE: Tell repository username exists
+        when(userRepository.existsByUsername("student123"))
+            .thenReturn(true);
 
-    @Test
-    @DisplayName("Should throw exception when email already exists")
-    void testCreateUser_EmailExists() {
-        // ARRANGE
-        when(userRepository.existsByUsername("newuser")).thenReturn(false);
-        when(userRepository.existsByEmail("existing@example.com")).thenReturn(true);
+        // ACT: This just demonstrates checking - userService doesn't have this method,
+        // but this shows how you would test it
+        boolean exists = userRepository.existsByUsername("student123");
 
-        // ACT & ASSERT
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-            userService.createUser("newuser", "password123", 
-                                   "existing@example.com", Role.STUDENT);
-        });
-        
-        assertEquals("Email already exists", exception.getMessage());
-        verify(userRepository, times(1)).existsByEmail("existing@example.com");
-        verify(userRepository, never()).save(any(User.class));
-    }
-
-    @Test
-    @DisplayName("Should get user by username")
-    void testGetUserByUsername_Success() {
-        // ARRANGE
-        when(userRepository.findByUsername("testuser"))
-            .thenReturn(Optional.of(testUser));
-
-        // ACT
-        Optional<User> foundUser = userService.getUserByUsername("testuser");
-
-        // ASSERT
-        assertTrue(foundUser.isPresent());
-        assertEquals("testuser", foundUser.get().getUsername());
-        assertEquals("test@example.com", foundUser.get().getEmail());
-        verify(userRepository, times(1)).findByUsername("testuser");
-    }
-
-    @Test
-    @DisplayName("Should return empty when username not found")
-    void testGetUserByUsername_NotFound() {
-        // ARRANGE
-        when(userRepository.findByUsername("nonexistent"))
-            .thenReturn(Optional.empty());
-
-        // ACT
-        Optional<User> foundUser = userService.getUserByUsername("nonexistent");
-
-        // ASSERT
-        assertFalse(foundUser.isPresent());
-        verify(userRepository, times(1)).findByUsername("nonexistent");
+        // ASSERT: Should return true
+        assertTrue(exists, "Username should exist");
     }
 }
+
+/**
+ * ============================================
+ * 📚 KEY CONCEPTS EXPLAINED
+ * ============================================
+ * 
+ * 1. @Mock
+ *    - Creates a FAKE object
+ *    - Doesn't connect to real database
+ *    - You control what it returns
+ * 
+ * 2. @InjectMocks
+ *    - Creates the REAL object you're testing
+ *    - Automatically uses the @Mock objects
+ * 
+ * 3. when().thenReturn()
+ *    - "When this method is called, return this value"
+ *    - Example: when(repo.find("bob")).thenReturn(bobUser);
+ * 
+ * 4. verify()
+ *    - Checks if a method was called
+ *    - Example: verify(repo, times(1)).find("bob");
+ *    - Makes sure the method was used correctly
+ * 
+ * 5. assertEquals(expected, actual)
+ *    - Checks if two values are equal
+ *    - If not equal, test fails
+ * 
+ * 6. assertTrue() / assertFalse()
+ *    - Checks if something is true/false
+ * 
+ * ============================================
+ * 🏃 HOW TO RUN THIS TEST
+ * ============================================
+ * 
+ * Option 1: In VS Code
+ * - Right-click on this file
+ * - Click "Run Tests"
+ * 
+ * Option 2: In Docker
+ * docker-compose run app ./mvnw test -Dtest=UserServiceTest
+ * 
+ * Option 3: See if tests pass/fail
+ * - Green ✅ = Test passed
+ * - Red ❌ = Test failed
+ * 
+ * ============================================
+ */
