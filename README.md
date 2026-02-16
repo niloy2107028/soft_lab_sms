@@ -203,10 +203,12 @@ See `.github/workflows/ci.yml` for details.
 ## 📚 Additional Documentation
 
 ### Testing
+
 - [Beginner's Test Guide](docs/testing/BEGINNER_TEST_GUIDE.md) - Complete guide to understanding and running tests
 - [Quick Test Commands](docs/testing/RUN_TESTS.txt) - Command reference for running tests
 
 ### GitHub & CI/CD
+
 - [GitHub Actions Explained](docs/github/GITHUB_ACTIONS_EXPLAINED.md) - How cloud testing works
 - [Branch Protection Guide](docs/github/BRANCH_PROTECTION_GUIDE.md) - Setting up branch protection rules
 
