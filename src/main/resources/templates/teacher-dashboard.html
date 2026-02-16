@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Teacher Dashboard</title>
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body>
+    <nav class="navbar">
+      <div class="nav-brand">Student Management System</div>
+      <div class="nav-menu">
+        <a href="/teacher/dashboard" class="nav-link active">Dashboard</a>
+        <a href="/teacher/profile" class="nav-link">My Profile</a>
+        <a href="/teacher/students" class="nav-link">Manage Students</a>
+        <a href="/teacher/teachers" class="nav-link">Manage Teachers</a>
+        <a href="/teacher/courses" class="nav-link">Manage Courses</a>
+        <a href="/teacher/departments" class="nav-link">Manage Departments</a>
+        <form th:action="@{/logout}" method="post" style="display: inline">
+          <button type="submit" class="btn btn-logout">Logout</button>
+        </form>
+      </div>
+    </nav>
+
+    <div class="container">
+      <div class="welcome-section">
+        <h1>
+          Welcome,
+          <span th:text="${teacher.firstName + ' ' + teacher.lastName}"></span>!
+        </h1>
+        <p class="role-badge teacher-badge">Teacher</p>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-number" th:text="${#lists.size(students)}"></div>
+          <div class="stat-label">Total Students</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" th:text="${#lists.size(teachers)}"></div>
+          <div class="stat-label">Total Teachers</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" th:text="${#lists.size(courses)}"></div>
+          <div class="stat-label">Total Courses</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" th:text="${#lists.size(departments)}"></div>
+          <div class="stat-label">Departments</div>
+        </div>
+      </div>
+
+      <div class="dashboard-grid">
+        <div class="card">
+          <h2>Recent Students</h2>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Student ID</th>
+                <th>Name</th>
+                <th>Department</th>
+                <th>Email</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                th:each="student, iterStat : ${students}"
+                th:if="${iterStat.index < 5}"
+              >
+                <td th:text="${student.studentId}"></td>
+                <td
+                  th:text="${student.firstName + ' ' + student.lastName}"
+                ></td>
+                <td th:text="${student.department.name}"></td>
+                <td th:text="${student.user.email}"></td>
+              </tr>
+            </tbody>
+          </table>
+          <a href="/teacher/students" class="btn btn-link"
+            >View All Students →</a
+          >
+        </div>
+
+        <div class="card">
+          <h2>Recent Courses</h2>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Code</th>
+                <th>Course Name</th>
+                <th>Credits</th>
+                <th>Department</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                th:each="course, iterStat : ${courses}"
+                th:if="${iterStat.index < 5}"
+              >
+                <td th:text="${course.courseCode}"></td>
+                <td th:text="${course.courseName}"></td>
+                <td th:text="${course.credits}"></td>
+                <td
+                  th:text="${course.department != null ? course.department.name : 'N/A'}"
+                ></td>
+              </tr>
+            </tbody>
+          </table>
+          <a href="/teacher/courses" class="btn btn-link">View All Courses →</a>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

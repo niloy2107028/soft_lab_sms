@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Manage Departments</title>
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body>
+    <nav class="navbar">
+      <div class="nav-brand">Student Management System</div>
+      <div class="nav-menu">
+        <a href="/teacher/dashboard" class="nav-link">Dashboard</a>
+        <a href="/teacher/profile" class="nav-link">My Profile</a>
+        <a href="/teacher/students" class="nav-link">Manage Students</a>
+        <a href="/teacher/teachers" class="nav-link">Manage Teachers</a>
+        <a href="/teacher/courses" class="nav-link">Manage Courses</a>
+        <a href="/teacher/departments" class="nav-link active"
+          >Manage Departments</a
+        >
+        <form th:action="@{/logout}" method="post" style="display: inline">
+          <button type="submit" class="btn btn-logout">Logout</button>
+        </form>
+      </div>
+    </nav>
+
+    <div class="container">
+      <h1>Manage Departments</h1>
+
+      <div th:if="${param.success}" class="alert alert-success">
+        Department created successfully!
+      </div>
+      <div th:if="${param.updated}" class="alert alert-success">
+        Department updated successfully!
+      </div>
+      <div th:if="${param.deleted}" class="alert alert-success">
+        Department deleted successfully!
+      </div>
+
+      <div class="card">
+        <h2>Add New Department</h2>
+        <form th:action="@{/teacher/departments/create}" method="post">
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Department Name</label>
+              <input type="text" name="name" required />
+            </div>
+            <div class="form-group" style="grid-column: span 2">
+              <label>Description</label>
+              <textarea name="description" rows="3"></textarea>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary">
+            Create Department
+          </button>
+        </form>
+      </div>
+
+      <div class="card">
+        <h2>All Departments</h2>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Description</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="dept : ${departments}">
+              <td th:text="${dept.name}"></td>
+              <td th:text="${dept.description ?: 'N/A'}"></td>
+              <td>
+                <form
+                  th:action="@{/teacher/departments/delete/{id}(id=${dept.id})}"
+                  method="post"
+                  style="display: inline"
+                >
+                  <button
+                    type="submit"
+                    class="btn btn-danger btn-sm"
+                    onclick="return confirm('Are you sure?');"
+                  >
+                    Delete
+                  </button>
+                </form>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </body>
+</html>

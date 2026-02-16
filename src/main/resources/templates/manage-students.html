@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Manage Students</title>
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body>
+    <nav class="navbar">
+      <div class="nav-brand">Student Management System</div>
+      <div class="nav-menu">
+        <a href="/teacher/dashboard" class="nav-link">Dashboard</a>
+        <a href="/teacher/profile" class="nav-link">My Profile</a>
+        <a href="/teacher/students" class="nav-link active">Manage Students</a>
+        <a href="/teacher/teachers" class="nav-link">Manage Teachers</a>
+        <a href="/teacher/courses" class="nav-link">Manage Courses</a>
+        <a href="/teacher/departments" class="nav-link">Manage Departments</a>
+        <form th:action="@{/logout}" method="post" style="display: inline">
+          <button type="submit" class="btn btn-logout">Logout</button>
+        </form>
+      </div>
+    </nav>
+
+    <div class="container">
+      <h1>Manage Students</h1>
+
+      <div th:if="${param.success}" class="alert alert-success">
+        Student created successfully!
+      </div>
+      <div th:if="${param.updated}" class="alert alert-success">
+        Student updated successfully!
+      </div>
+      <div th:if="${param.deleted}" class="alert alert-success">
+        Student deleted successfully!
+      </div>
+      <div th:if="${param.error}" class="alert alert-error">
+        Error: <span th:text="${param.error}"></span>
+      </div>
+
+      <div class="card">
+        <h2>Add New Student</h2>
+        <form th:action="@{/teacher/students/create}" method="post">
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Username</label>
+              <input type="text" name="username" required />
+            </div>
+            <div class="form-group">
+              <label>Password</label>
+              <input type="password" name="password" required />
+            </div>
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email" name="email" required />
+            </div>
+            <div class="form-group">
+              <label>First Name</label>
+              <input type="text" name="firstName" required />
+            </div>
+            <div class="form-group">
+              <label>Last Name</label>
+              <input type="text" name="lastName" required />
+            </div>
+            <div class="form-group">
+              <label>Student ID</label>
+              <input type="text" name="studentId" required />
+            </div>
+            <div class="form-group">
+              <label>Department</label>
+              <select name="departmentId" required>
+                <option value="">Select Department</option>
+                <option
+                  th:each="dept : ${departments}"
+                  th:value="${dept.id}"
+                  th:text="${dept.name}"
+                ></option>
+              </select>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary">Create Student</button>
+        </form>
+      </div>
+
+      <div class="card">
+        <h2>All Students</h2>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Student ID</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Department</th>
+              <th>Phone</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="student : ${students}">
+              <td th:text="${student.studentId}"></td>
+              <td th:text="${student.firstName + ' ' + student.lastName}"></td>
+              <td th:text="${student.user.email}"></td>
+              <td th:text="${student.department.name}"></td>
+              <td th:text="${student.phone ?: 'N/A'}"></td>
+              <td>
+                <form
+                  th:action="@{/teacher/students/delete/{id}(id=${student.id})}"
+                  method="post"
+                  style="display: inline"
+                >
+                  <button
+                    type="submit"
+                    class="btn btn-danger btn-sm"
+                    onclick="return confirm('Are you sure?');"
+                  >
+                    Delete
+                  </button>
+                </form>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </body>
+</html>

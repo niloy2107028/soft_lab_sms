@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Dashboard</title>
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body>
+    <nav class="navbar">
+      <div class="nav-brand">Student Management System</div>
+      <div class="nav-menu">
+        <a href="/student/dashboard" class="nav-link active">Dashboard</a>
+        <a href="/student/profile" class="nav-link">My Profile</a>
+        <form th:action="@{/logout}" method="post" style="display: inline">
+          <button type="submit" class="btn btn-logout">Logout</button>
+        </form>
+      </div>
+    </nav>
+
+    <div class="container">
+      <div class="welcome-section">
+        <h1>
+          Welcome,
+          <span th:text="${student.firstName + ' ' + student.lastName}"></span>!
+        </h1>
+        <p class="role-badge student-badge">Student</p>
+      </div>
+
+      <div th:if="${param.enrolled}" class="alert alert-success">
+        Successfully enrolled in course!
+      </div>
+
+      <div th:if="${param.unenrolled}" class="alert alert-success">
+        Successfully unenrolled from course!
+      </div>
+
+      <div class="dashboard-grid">
+        <!-- My Courses Section -->
+        <div class="card">
+          <h2>My Courses</h2>
+          <div th:if="${courses.empty}" class="empty-state">
+            <p>You are not enrolled in any courses yet.</p>
+          </div>
+          <div th:unless="${courses.empty}">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Code</th>
+                  <th>Course Name</th>
+                  <th>Credits</th>
+                  <th>Teacher</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr th:each="course : ${courses}">
+                  <td th:text="${course.courseCode}"></td>
+                  <td th:text="${course.courseName}"></td>
+                  <td th:text="${course.credits}"></td>
+                  <td
+                    th:text="${course.teacher != null ? course.teacher.firstName + ' ' + course.teacher.lastName : 'N/A'}"
+                  ></td>
+                  <td>
+                    <form
+                      th:action="@{/student/unenroll/{id}(id=${course.id})}"
+                      method="post"
+                      style="display: inline"
+                    >
+                      <button
+                        type="submit"
+                        class="btn btn-danger btn-sm"
+                        onclick="return confirm('Are you sure?');"
+                      >
+                        Unenroll
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Available Courses Section -->
+        <div class="card">
+          <h2>Available Courses</h2>
+          <div th:if="${allCourses.empty}" class="empty-state">
+            <p>No courses available at the moment.</p>
+          </div>
+          <div th:unless="${allCourses.empty}">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Code</th>
+                  <th>Course Name</th>
+                  <th>Credits</th>
+                  <th>Department</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr th:each="course : ${allCourses}">
+                  <td th:text="${course.courseCode}"></td>
+                  <td th:text="${course.courseName}"></td>
+                  <td th:text="${course.credits}"></td>
+                  <td
+                    th:text="${course.department != null ? course.department.name : 'N/A'}"
+                  ></td>
+                  <td>
+                    <form
+                      th:action="@{/student/enroll/{id}(id=${course.id})}"
+                      method="post"
+                      style="display: inline"
+                    >
+                      <button
+                        type="submit"
+                        class="btn btn-success btn-sm"
+                        th:disabled="${courses.contains(course)}"
+                      >
+                        <span
+                          th:text="${courses.contains(course)} ? 'Enrolled' : 'Enroll'"
+                        ></span>
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- My Information -->
+        <div class="card">
+          <h2>My Information</h2>
+          <div class="info-grid">
+            <div class="info-item">
+              <strong>Student ID:</strong>
+              <span th:text="${student.studentId}"></span>
+            </div>
+            <div class="info-item">
+              <strong>Department:</strong>
+              <span th:text="${student.department.name}"></span>
+            </div>
+            <div class="info-item">
+              <strong>Email:</strong>
+              <span th:text="${student.user.email}"></span>
+            </div>
+            <div class="info-item">
+              <strong>Phone:</strong>
+              <span th:text="${student.phone ?: 'Not provided'}"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

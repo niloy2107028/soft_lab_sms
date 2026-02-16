@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Teacher Profile</title>
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body>
+    <nav class="navbar">
+      <div class="nav-brand">Student Management System</div>
+      <div class="nav-menu">
+        <a href="/teacher/dashboard" class="nav-link">Dashboard</a>
+        <a href="/teacher/profile" class="nav-link active">My Profile</a>
+        <a href="/teacher/students" class="nav-link">Manage Students</a>
+        <a href="/teacher/teachers" class="nav-link">Manage Teachers</a>
+        <a href="/teacher/courses" class="nav-link">Manage Courses</a>
+        <a href="/teacher/departments" class="nav-link">Manage Departments</a>
+        <form th:action="@{/logout}" method="post" style="display: inline">
+          <button type="submit" class="btn btn-logout">Logout</button>
+        </form>
+      </div>
+    </nav>
+
+    <div class="container">
+      <h1>My Profile</h1>
+
+      <div th:if="${param.success}" class="alert alert-success">
+        Profile updated successfully!
+      </div>
+
+      <div class="card">
+        <form
+          th:action="@{/teacher/profile/update}"
+          th:object="${teacher}"
+          method="post"
+        >
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="firstName">First Name</label>
+              <input
+                type="text"
+                id="firstName"
+                th:field="*{firstName}"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="lastName">Last Name</label>
+              <input
+                type="text"
+                id="lastName"
+                th:field="*{lastName}"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="phone">Phone</label>
+              <input type="text" id="phone" th:field="*{phone}" />
+            </div>
+
+            <div class="form-group">
+              <label for="address">Address</label>
+              <input type="text" id="address" th:field="*{address}" />
+            </div>
+
+            <div class="form-group">
+              <label for="specialization">Specialization</label>
+              <input
+                type="text"
+                id="specialization"
+                th:field="*{specialization}"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="department">Department</label>
+              <select id="department" th:field="*{department.id}" required>
+                <option
+                  th:each="dept : ${departments}"
+                  th:value="${dept.id}"
+                  th:text="${dept.name}"
+                ></option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+              Update Profile
+            </button>
+            <a href="/teacher/dashboard" class="btn btn-secondary">Cancel</a>
+          </div>
+        </form>
+      </div>
+
+      <div class="card">
+        <h3>Account Information</h3>
+        <div class="info-grid">
+          <div class="info-item">
+            <strong>Employee ID:</strong>
+            <span th:text="${teacher.employeeId}"></span>
+          </div>
+          <div class="info-item">
+            <strong>Username:</strong>
+            <span th:text="${teacher.user.username}"></span>
+          </div>
+          <div class="info-item">
+            <strong>Email:</strong>
+            <span th:text="${teacher.user.email}"></span>
+          </div>
+          <div class="info-item">
+            <strong>Role:</strong>
+            <span class="role-badge teacher-badge">Teacher</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
